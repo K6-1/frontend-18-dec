@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mini Users App</title>
+</head>
+<body>
+  <h1>Mini Users App</h1>
+
+  <!-- Form to Add User -->
+  <h3>Add New User</h3>
+  <input type="text" id="name" placeholder="Enter Name" />
+  <input type="email" id="email" placeholder="Enter Email" />
+  <button id="addUser">Add User</button>
+
+  <!-- CRUD Buttons -->
+  <h3>Manage Users</h3>
+  <button id="fetchUsers">Get Users</button>
+  <button id="updateUser">Update User of Id 1</button>
+  <button id="deleteUser">Delete User of Id 1</button>
+
+  <!-- User List -->
+  <h3>Users List:</h3>
+  <ul id="userList"></ul>
+  <script>
+  const apiUrl = 'https://occipital-same-browser.glitch.me/users'; // Replace with your Glitch URL
+
+  // Display Users in the List
+  async function displayUsers() {
+    const userList = document.getElementById('userList');
+    userList.innerHTML = ''; // Clear the list first
+    try {
+      const response = await fetch(apiUrl);
+      const users = await response.json();
+      users.forEach((user) => {
+        const li = document.createElement('li');
+        li.textContent = `ID: ${user.id}, Name: ${user.name}, Email: ${user.email}`;
+        userList.appendChild(li);
+      });
+    } catch (error) {
+      console.error('Error fetching users:', error);
+    }
+  }
+  
+  // Add User
+  document.getElementById('addUser').addEventListener('click', async () => {
+    const name = document.getElementById('name').value;
+    const email = document.getElementById('email').value;
+  
+    if (!name || !email) {
+      alert('Please enter both name and email');
+      return;
+    }
+  
+    try {
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email }),
+      });
+      const newUser = await response.json();
+      console.log('User Added:', newUser);
+      displayUsers(); // Refresh user list
+    } catch (error) {
+      console.error('Error adding user:', error);
+    }
+  });
+  
+  // Fetch Users
+  document.getElementById('fetchUsers').addEventListener('click', displayUsers);
+  
+  // Update User of ID 1
+  document.getElementById('updateUser').addEventListener('click', async () => {
+    try {
+      const response = await fetch(`${apiUrl}`/1, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: 'Alice', email: 'alice@example.com' }),
+      });
+      const updatedUser = await response.json();
+      console.log('Updated User:', updatedUser);
+      displayUsers(); // Refresh user list
+    } catch (error) {
+      console.error('Error updating user:', error);
+    }
+  });
+  
+  // Delete User of ID 1
+  document.getElementById('deleteUser').addEventListener('click', async () => {
+    try {
+      await fetch(`${apiUrl}`/1, { method: 'DELETE' });
+      console.log('User with ID 1 deleted');
+      displayUsers(); // Refresh user list
+    } catch (error) {
+      console.error('Error deleting user:', error);
+    }
+  });
+</script>
+  
+</body>
+</html>
+   
+    
